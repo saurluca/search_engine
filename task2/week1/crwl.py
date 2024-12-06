@@ -15,5 +15,5 @@ while agenda:
     if r.status_code == 200:
         print(r.headers)
         soup = BeautifulSoup(r.content, 'html.parser')
-        print(soup.find_all('a'))
+        # print(soup.find_all('a'))
         

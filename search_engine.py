@@ -27,7 +27,7 @@ def search(search_query):
 
 
 def add_page_to_db(url, text):
-    # Todo add error handling
+    # Todo add error handling if url and text not provided
     if not os.path.exists(index_dir):
         os.mkdir(index_dir)
         ix = create_in(index_dir, schema)
@@ -41,6 +41,7 @@ def add_page_to_db(url, text):
         print(f"Failed to add document: {e}")
 
 
+# for testing purpose
 def print_all_woosh_entries():
     print("All entries from Whoosh index (Link and Content):")
     ix = open_dir(index_dir)
@@ -51,12 +52,3 @@ def print_all_woosh_entries():
             content = doc.get('content', 'No content')
             print(f"Link: {link}\nContent: {content}\n{'-'*40}")
 
-
-def test_search(search_query):
-    ix = open_dir(index_dir)
-    with ix.searcher() as searcher:
-        query = QueryParser("content", ix.schema).parse(search_query)
-        results = searcher.search(query)
-        print("results: ")
-        for r in results:
-            print(r['link'])

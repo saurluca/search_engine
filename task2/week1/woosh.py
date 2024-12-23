@@ -1,6 +1,7 @@
 import os
-from whoosh.index import create_in
+
 from whoosh.fields import Schema, TEXT
+from whoosh.index import create_in
 
 # Here, the structure of index entires is defined. You can add more fields with metadata, computed values etc.,
 # and use them for searching and ranking.
@@ -10,8 +11,8 @@ from whoosh.fields import Schema, TEXT
 #
 schema = Schema(title=TEXT(stored=True), content=TEXT)
 
-if not os.path.exists("index"):
-    os.mkdir("index")
+if not os.path.exists("../../index"):
+    os.mkdir("../../index")
 ix = create_in("index", schema)
 
 # Create an index in the directory indexdr (the directory must already exist!)

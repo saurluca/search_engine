@@ -1,10 +1,7 @@
-import os
 import requests
 from bs4 import BeautifulSoup
-from whoosh.fields import Schema, TEXT
-from whoosh.index import create_in
-from whoosh.index import open_dir
-from whoosh.qparser import QueryParser
+
+from search_engine import add_page_to_db, search
 
 
 prefix = "https://vm009.rz.uos.de/crawl/"
@@ -15,20 +12,6 @@ start_url = prefix+'index.html'
 
 visited = set()
 agenda = [start_url]
-
-schema = Schema(link=TEXT(stored=True), content=TEXT(stored=True))
-index_dir = "index"
-
-
-def print_all_woosh_entries():
-    print("All entries from Whoosh index (Link and Content):")
-    ix = open_dir(index_dir)
-    with ix.searcher() as searcher:
-        for docnum in range(searcher.doc_count()):
-            doc = searcher.stored_fields(docnum)
-            link = doc.get('link', 'No link')
-            content = doc.get('content', 'No content')
-            print(f"Link: {link}\nContent: {content}\n{'-'*40}")
 
 
 def is_same_domain(url):
@@ -62,57 +45,37 @@ def get_new_links(url):
         print("Request failed:", e)
 
 
-def get_text(url, writer):
+def get_text(url):
     try:
         r = requests.get(url, timeout=5)
         if r.status_code == 200:
             soup = BeautifulSoup(r.content, 'html.parser')
             text = soup.find('body').get_text(separator=' ', strip=True)
             text = str(text)
-            print("soup", soup)
-            print("body", text)
-            writer.add_document(link=url, content=text)
+            add_page_to_db(url, text)
         else:
             print("HTTP Error:", r.status_code)
     except requests.exceptions.RequestException as e:
         print("Request failed:", e)
 
 
-def crawl_page(url, writer):
+def crawl_page(url):
     print("Crawling:", url)
     get_new_links(url)
-    get_text(url, writer)
+    get_text(url)
 
 
 def run():
-    if not os.path.exists(index_dir):
-        os.mkdir(index_dir)
-    ix = create_in(index_dir, schema)
-    writer = ix.writer()
-
     while agenda:
         url = agenda.pop()
         if url not in visited:
             visited.add(url)
-            crawl_page(url, writer)
-
-    writer.commit()
+            crawl_page(url)
 
     print("Crawling complete. Total pages visited:", len(visited))
     print("All links visited:", visited)
 
 
-def test_search():
-    ix = open_dir(index_dir)
-    with ix.searcher() as searcher:
-        query = QueryParser("content", ix.schema).parse("egg mammal endemic")
-        results = searcher.search(query)
-        print("results: ")
-        for r in results:
-            print(r['link'])
-
-
 if __name__ == '__main__':
     run()
-    # print_all_woosh_entries()
-    test_search()
+    search("egg")

@@ -4,39 +4,31 @@ import os
 from whoosh.index import create_in
 from whoosh.fields import *
 from whoosh.index import open_dir
-
+from whoosh.qparser import QueryParser
 
 
 prefix = "https://vm009.rz.uos.de/crawl/"
+# prefix = "https://whoosh.readthedocs.io/en/latest/"
 
 start_url = prefix+'index.html'
+# start_url = prefix+"quickstart.html"
 
 visited = set()
 agenda = [start_url]
 
-schema = Schema(title=TEXT(stored=True), content=TEXT)
+schema = Schema(link=TEXT(stored=True), content=TEXT(stored=True))
 index_dir = "index"
 
 
 def print_all_woosh_entries():
-    print("all")
-    # Open the index
+    print("All entries from Whoosh index (Link and Content):")
     ix = open_dir(index_dir)
-
-    # Extract all saved text from the index
     with ix.searcher() as searcher:
-        all_text = []
         for docnum in range(searcher.doc_count()):
-            doc = searcher.stored_fields(docnum)  # Get stored fields for the document
-            for key, value in doc.items():
-                if isinstance(value, str):  # Ensure the value is text
-                    all_text.append(value)
-
-    # Combine all text into a single string (optional)
-    combined_text = "\n".join(all_text)
-
-    # Output the text
-    print(combined_text)
+            doc = searcher.stored_fields(docnum)
+            link = doc.get('link', 'No link')
+            content = doc.get('content', 'No content')
+            print(f"Link: {link}\nContent: {content}\n{'-'*40}")
 
 
 def is_same_domain(url):
@@ -44,14 +36,12 @@ def is_same_domain(url):
 
 
 def resolve_url(base_url, link):
-    """
-    Manually resolve relative URLs.
-    """
+    # Manually resolve relative URLs.
     if link.startswith('http://') or link.startswith('https://'):
         return link  # Absolute URL
     if link.startswith('/'):
         return prefix + link[1:]  # Root-relative URL
-    return base_url.rsplit('/', 1)[0] + '/' + link  # Page-relative URL
+    return base_url.rsplit('/', 1)[0] + '/' + link  # Page-relative URL
 
 
 def get_new_links(url):
@@ -77,8 +67,11 @@ def get_text(url, writer):
         r = requests.get(url, timeout=5)
         if r.status_code == 200:
             soup = BeautifulSoup(r.content, 'html.parser')
-            text = soup.find('body').text
-            writer.add_document(title=url, content=text)
+            text = soup.find('body').get_text(separator=' ', strip=True)
+            text = str(text)
+            print("soup", soup)
+            print("body", text)
+            writer.add_document(link=url, content=text)
         else:
             print("HTTP Error:", r.status_code)
     except requests.exceptions.RequestException as e:
@@ -109,7 +102,17 @@ def run():
     print("All links visited:", visited)
 
 
+def test_search():
+    ix = open_dir(index_dir)
+    with ix.searcher() as searcher:
+        query = QueryParser("content", ix.schema).parse("egg mammal endemic")
+        results = searcher.search(query)
+        print("results: ")
+        for r in results:
+            print(r['link'])
+
+
 if __name__ == '__main__':
     run()
-    print_all_woosh_entries()
-
+    # print_all_woosh_entries()
+    test_search()

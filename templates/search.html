@@ -7,16 +7,28 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<h1>
+<h1 style="font-size: 50px">
     Search form
 </h1>
-<p style="margin-bottom: 50px; font-size: 25px">
+<p style="margin-bottom: 30px; margin-top: 10px;">
     Whooooooosh docs
 </p>
 <form action="search" method='get'>
     <input name="search_query" type="text"/>
 </form>
 <br/>
-<p>{{search_query}}</p>
+<p>Search query: {{search_query}}</p>
+{% if relevant_links %}
+<h2>Relevant links:</h2>
+<ul>
+    {% for link in relevant_links %}
+    <li style="margin-bottom: 6px">
+        <a href="{{ link }}" target="_blank">{{ link }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No relevant links found.</p>
+{% endif%}
 </body>
 </html>

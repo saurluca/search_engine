@@ -9,7 +9,7 @@ schema = Schema(link=TEXT(stored=True), content=TEXT(stored=True))
 index_dir = "index"
 
 
-def search(search_query):
+def search_db(search_query):
     # Todo improve error handling
     if not search_query:
         return "no query"

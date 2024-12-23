@@ -1,5 +1,5 @@
-from whoosh.index import create_in
 from whoosh.fields import *
+from whoosh.index import create_in
 
 # Here, the structure of index entires is defined. You can add more fields with metadata, computed values etc.,
 # and use them for searching and ranking. 
@@ -26,7 +26,7 @@ from whoosh.qparser import QueryParser
 with ix.searcher() as searcher:
     # find entries with the words 'first' AND 'last'
     query = QueryParser("content", ix.schema).parse("first last")
-    results = searcher.search(query)
+    results = searcher.search_db(query)
 
     # print all results
     for r in results:

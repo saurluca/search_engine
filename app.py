@@ -6,12 +6,7 @@ app = Flask(__name__)
 def start():
     return "<h1>Hello world.</h1><p>OK.</p>"
 
-@app.route("/test")
-def test():
-    return render_template("start.html")
-
-@app.route("/reversed")
-def reversed():
-    rev = request.args['rev'][::-1]
-    return render_template('reversed.html', rev=rev)
-
+@app.route("/search")
+def search():
+    search_query = request.args.get("search_query", "")
+    return render_template("search.html", search_query=search_query)

@@ -1,8 +1,8 @@
+import os
 import requests
 from bs4 import BeautifulSoup
-import os
+from whoosh.fields import Schema, TEXT
 from whoosh.index import create_in
-from whoosh.fields import *
 from whoosh.index import open_dir
 from whoosh.qparser import QueryParser
 

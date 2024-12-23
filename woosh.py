@@ -1,6 +1,6 @@
 import os
 from whoosh.index import create_in
-from whoosh.fields import *
+from whoosh.fields import Schema, TEXT
 
 # Here, the structure of index entires is defined. You can add more fields with metadata, computed values etc.,
 # and use them for searching and ranking.

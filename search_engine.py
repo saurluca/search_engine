@@ -9,14 +9,14 @@ schema = Schema(link=TEXT(stored=True), content=TEXT(stored=True))
 index_dir = "index"
 
 
-def search_db(search_query):
+def search_db(q):
     # Todo improve error handling
-    if not search_query:
+    if not q:
         return "no query"
 
     ix = open_dir(index_dir)
     with ix.searcher() as searcher:
-        query = QueryParser("content", ix.schema).parse(search_query)
+        query = QueryParser("content", ix.schema).parse(q)
         results = searcher.search(query)
         print("results: ")
         relevant_links = []

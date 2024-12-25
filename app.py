@@ -10,6 +10,6 @@ def start():
 
 @app.route("/search")
 def search():
-    search_query = request.args.get("search_query", "")
-    relevant_links = search_db(search_query) if search_query else ""
-    return render_template("search.html", search_query=search_query, relevant_links=relevant_links)
+    q = request.args.get("q", "")
+    relevant_links = search_db(q) if q else ""
+    return render_template("search.html", q=q, relevant_links=relevant_links)

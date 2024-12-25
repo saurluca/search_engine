@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-from search_engine import add_page_to_db
+from search_engine import add_page_to_db, search_db
 
 
 prefix = "https://vm009.rz.uos.de/crawl/"
@@ -78,4 +78,4 @@ def run():
 
 if __name__ == '__main__':
     run()
-    # search_db("egg")
+    search_db("egg")

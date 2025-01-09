@@ -246,3 +246,4 @@ cython_debug/
 #.idea/
 
 search_index.sqlite3
+search_index/

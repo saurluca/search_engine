@@ -11,17 +11,13 @@ def start():
 @app.route("/search")
 def search():
     q = request.args.get("q", "").strip()
+    fuzzy = True
     
     if q:
         start_time = time()
-        results = search_db(q)
+        results = search_db(q)  # Fuzzy search is enabled by default
         search_time = round(time() - start_time, 2)
         result_count = len(results)
-        
-        # Debug print
-        print(f"Query: {q}")
-        print(f"Found {result_count} results")
-        print(f"First result: {results[0] if results else 'None'}")
     else:
         results = []
         search_time = 0
@@ -32,18 +28,6 @@ def search():
         q=q,
         results=results,
         search_time=search_time,
-        result_count=result_count
+        result_count=result_count,
+        fuzzy=fuzzy
     )
-
-@app.route("/debug/search")
-def debug_search():
-    """Debug endpoint that returns raw JSON search results."""
-    q = request.args.get("q", "").strip()
-    if q:
-        results = search_db(q)
-        return jsonify({
-            'query': q,
-            'count': len(results),
-            'results': results
-        })
-    return jsonify({'error': 'No query provided'})

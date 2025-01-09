@@ -6,12 +6,13 @@ import logging
 from typing import Set, List, Optional
 from urllib.parse import urljoin, urlparse, urldefrag
 import os
+import shutil
 
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 
-from search_engine import add_page_to_db, debug_db
+from search_engine import add_page_to_db, init_search_engine, _search_engine
 
 # Configure logging
 logging.basicConfig(
@@ -119,24 +120,32 @@ class WebCrawler:
         logger.info(f"Pages stored: {self.pages_stored}")
 
 
-# crawler.py
 def main():
     """Main entry point for the crawler."""
-    from search_engine import init_db, debug_db
+    # Clear existing index
+    index_dir = "search_index"
+    if os.path.exists(index_dir):
+        print(f"Removing existing index at {index_dir}")
+        shutil.rmtree(index_dir)
     
-    # Initialize fresh database
-    init_db(force=True)
+    # Reinitialize search engine
+    print("Initializing fresh search index...")
+    init_search_engine()
     
     # Configuration
     BASE_URL = "https://whoosh.readthedocs.io/en/latest/"
+    
+    print("Starting crawler...")
     
     # Initialize and run crawler
     crawler = WebCrawler(BASE_URL)
     crawler.run()
     
-    # Verify database contents
-    logger.info("\nVerifying database contents:")
-    debug_db()
+    # Print index statistics
+    print("\nIndexing completed:")
+    with _search_engine.index.searcher() as searcher:
+        doc_count = searcher.doc_count()
+        print(f"Documents indexed: {doc_count}")
 
 
 if __name__ == '__main__':

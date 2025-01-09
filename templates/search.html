@@ -1,34 +1,68 @@
+<!-- templates/search.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search-form</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Whoosh Search Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        mark {
+            background-color: #fef08a;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+    </style>
 </head>
-<body>
-<h1 style="font-size: 50px">
-    Search form
-</h1>
-<p style="margin-bottom: 30px; margin-top: 10px;">
-    Whooooooosh docs
-</p>
-<form action="search" method='get'>
-    <input name="q" type="text"/>
-</form>
-<br/>
-<p>Search query: {{q}}</p>
-{% if relevant_links %}
-<h2>Relevant links:</h2>
-<ul>
-    {% for link in relevant_links %}
-    <li style="margin-bottom: 6px">
-        <a href="{{ link }}" target="_blank">{{ link }}</a>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No relevant links found.</p>
-{% endif%}
+<body class="bg-white min-h-screen">
+    <header class="border-b border-gray-200 py-4">
+        <div class="container mx-auto px-4 flex items-center">
+            <a href="/" class="text-2xl font-bold mr-8">
+                <span class="text-blue-500">W</span><span class="text-red-500">h</span><span class="text-yellow-500">o</span><span class="text-blue-500">o</span><span class="text-green-500">s</span><span class="text-red-500">h</span>
+            </a>
+            <form action="/search" method="get" class="flex-grow max-w-2xl">
+                <div class="flex items-center pr-2 border border-gray-300 rounded-md overflow-hidden shadow-sm hover:shadow-md focus-within:shadow-md">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        class="w-full py-2 px-4 outline-none text-lg" 
+                        value="{{ q }}" 
+                        placeholder="Search..."
+                        required
+                    />
+                    <button type="submit" class="p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </header>
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl">
+            {% if q %}
+                <p class="text-sm text-gray-600 mb-4">
+                    About {{ result_count }} results ({{ search_time }} seconds)
+                </p>
+                
+                {% if results %}
+                    {% for result in results %}
+                    <div class="mb-8">
+                        <h2 class="text-xl mb-1">
+                            <a href="{{ result.url }}" class="text-blue-700 hover:underline">
+                                {{ result.title or result.url }}
+                            </a>
+                        </h2>
+                        <p class="text-sm text-green-700 mb-1">{{ result.url }}</p>
+                        <p class="text-sm text-gray-600">{{ result.text | safe }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-gray-600">No results found for "{{ q }}"</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </main>
 </body>
 </html>

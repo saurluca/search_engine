@@ -3,10 +3,10 @@ Web Crawler Module
 """
 
 import logging
-from typing import Set, List, Optional
-from urllib.parse import urljoin, urlparse, urldefrag
 import os
 import shutil
+from typing import Set, List, Optional
+from urllib.parse import urljoin, urldefrag
 
 import requests
 from bs4 import BeautifulSoup
@@ -53,13 +53,15 @@ class WebCrawler:
 
     def _extract_links(self, url: str, soup: BeautifulSoup) -> None:
         links = [a.get('href') for a in soup.find_all('a', href=True)]
-        
+
         for link in links:
             full_link = self._resolve_url(url, link)
-            if (self._is_same_domain(full_link) and 
-                full_link not in self.visited and 
-                full_link not in self.agenda):
-                self.agenda.append(full_link)
+            clean_link = self._clean_url(full_link)
+
+            if (self._is_same_domain(clean_link) and
+                    clean_link not in self.visited and
+                    clean_link not in self.agenda):
+                self.agenda.append(clean_link)
 
     def _extract_and_store_content(self, url: str, soup: BeautifulSoup) -> None:
         """Extract and store page content."""
@@ -76,6 +78,8 @@ class WebCrawler:
 
             # Extract main content
             content = soup.get_text(separator=' ', strip=True)
+            if len(content) > 1000:  # Arbitrary limit, to avoid storing very large pages
+                content = content[:1000] + " [Content truncated]"
 
             # Store the page
             if content:

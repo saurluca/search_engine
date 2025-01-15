@@ -2,16 +2,15 @@
 Search Engine Module with advanced search capabilities using Whoosh.
 """
 
-from typing import Dict, List
-import os
 import re
 from pathlib import Path
+from typing import Dict, List
 
-from whoosh.index import create_in, open_dir
-from whoosh.fields import Schema, TEXT, ID
-from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
 from whoosh.analysis import StemmingAnalyzer
-from whoosh.query import FuzzyTerm
+from whoosh.fields import Schema, TEXT, ID
+from whoosh.index import create_in, open_dir
+from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
+
 
 class SearchEngine:
     """Search engine implementation using Whoosh."""
@@ -54,12 +53,12 @@ class SearchEngine:
             content: Page content
         """
         writer = self.index.writer()
-        
+
         try:
             writer.update_document(
                 url=url,
-                title=title or url,
-                content=content
+                title=str(title or url),
+                content=str(content)
             )
             writer.commit()
             print(f"Indexed page: {url}")
